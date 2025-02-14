@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export default axios.create({
-  baseURL: "https://jedsada-api.onrender.com",
+  baseURL: "https://jedsada-api.onrender.com/",
   headers: {
     "Content-type": "application/json"
   }
