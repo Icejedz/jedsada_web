@@ -1,21 +1,36 @@
 import React, { useState }  from 'react'
+import PostService from '../Services/post.service';
 
-const PostItem = ({ fullName, text, datetime }) => {
+const PostItem = ({ id, fullName, text, datetime, comments }) => {
+  const [textComments, setTextComments] = useState(comments);
   const [newCommentText, setNewCommentText] = useState(""); // State for new comment text
 
     const handleCommentSubmit = (e) => {
       e.preventDefault();
       // Handle comment submission logic here (e.g., API call, state update)
+      const userId = localStorage.getItem("currentUser");
+      const newComment = {
+        text: newCommentText,
+        userId: userId,
+      };
+      PostService.comment(id, newComment)
+        .then((response) => {
+          console.log("Comment submitted:", response.data);
+          setTextComments([...textComments, response.data]); // Update the comments state
+        })
+        .catch((error) => {
+          console.error("Error submitting comment:", error);
+        });
       console.log("Comment submitted:", newCommentText);
       setNewCommentText(""); // Clear the input field
     };
-    const dummyComments = [
-      { user: { fullName: "Commenter 1" }, text: "This is the first comment." },
-      {
-        user: { fullName: "Commenter 2" },
-        text: "And this is the second comment.",
-      },
-    ];
+    // const dummyComments = [
+    //   { user: { fullName: "Commenter 1" }, text: "This is the first comment." },
+    //   {
+    //     user: { fullName: "Commenter 2" },
+    //     text: "And this is the second comment.",
+    //   },
+    // ];
 
     return (
       <div className="mb-4 p-4 bg-white rounded-lg shadow">
@@ -36,11 +51,11 @@ const PostItem = ({ fullName, text, datetime }) => {
         <div className="mt-2">
           {" "}
           {/* Added margin top */}
-          {dummyComments.map((comment, index) => (
+          {textComments.map((comment, index) => (
             <div key={index} className="mb-2 p-2 bg-gray-100 rounded-md">
               {" "}
               {/* Added margin bottom, padding, background, and rounded corners */}
-              <div className="font-bold text-sm">{comment.user.fullName}</div>{" "}
+              <div className="font-bold text-sm">{comment.user.name}</div>{" "}
               {/* Smaller font for commenter name */}
               <p className="text-sm">{comment.text}</p>{" "}
               {/* Smaller font for comment text */}

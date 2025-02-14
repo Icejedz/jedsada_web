@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import PostItem from "./PostItem";
+import PostService from "../Services/post.service";
 
 const Post = () => {
   const [postText, setPostText] = useState("");
@@ -8,10 +9,37 @@ const Post = () => {
   const handlePostSubmit = (e) => {
     e.preventDefault();
     // Handle post submission logic here (e.g., API call, state update)
-    console.log("Post submitted:", postText);
-    setPostText(""); // Clear the textbox after posting
+    const authorId = localStorage.getItem("currentUser");
+    const postData = {
+      title: "",
+      content: postText,
+      authorId: authorId,
+    }
+    PostService.create(postData)
+      .then((response) => {
+        console.log(response.data);
+        fetchPosts();
+        alert("Post submitted success")
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+  const [posts, setPosts] = useState([]);
+  const fetchPosts = () => {
+    PostService.get()
+      .then((response) => {
+        console.log(response.data);
+        setPosts(response.data);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   };
 
+  useEffect(()=>{
+    fetchPosts();
+  },[]);
 
   return (
     <Layout>
@@ -28,6 +56,7 @@ const Post = () => {
             />
             <button
               type="submit"
+              onClick={handlePostSubmit}
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             >
               Post
@@ -38,32 +67,17 @@ const Post = () => {
         {/* Display Posts Section - Static Content */}
         <div>
           <h2 className="text-2xl font-bold mb-4">Posts</h2>
-
-          <PostItem
-            fullName="John Doe"
-            text="This is a static post.  No mapping needed!"
-            datetime="2024-07-27, 09:00"
-          />
-          <PostItem
-            fullName="Jane Smith"
-            text="Another static post example."
-            datetime="2024-07-27, 10:30"
-          />
-          <PostItem
-            fullName="Peter Jones"
-            text="Yet another one!  Static content is easy."
-            datetime="2024-07-27, 12:00"
-          />
-          <PostItem
-            fullName="Alice Johnson"
-            text="Four posts, all static!"
-            datetime="2024-07-27, 14:00"
-          />
-          <PostItem
-            fullName="Bob Williams"
-            text="Last static post"
-            datetime="2024-07-27, 15:30"
-          />
+          {/* map posts to PostItem */}
+          {posts.map((post) => (
+            <PostItem
+              key={post.id}
+              id={post.id}
+              fullName={post.author.name}
+              text={post.content}
+              datetime={"Today"}
+              comments={post.comments}
+            />
+          ))}
         </div>
       </div>
     </Layout>

@@ -5,7 +5,10 @@ import User from './Pages/User'
 import Post from './Pages/Post'
 import Profile from './Pages/Profile'
 const App = () => {
-  return (
+   //สมมติว่าเรา login แล้ว
+   localStorage.setItem('currentUser','679b92128289c9e7b70dbb3b');
+    return (
+  
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
